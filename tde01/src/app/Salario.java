@@ -29,7 +29,7 @@ import java.math.RoundingMode;
 
 public class Salario {
   private Double salarioBruto;
-  private BigDecimal salarioLiquido;
+  private Double salarioLiquido;
 
   public Salario(Double _salarioBruto) throws Exception {
     if (verificaValor(_salarioBruto)) {
@@ -49,11 +49,34 @@ public class Salario {
   }
 
   public BigDecimal getSalarioLiquido() {
+    // return salarioLiquido.doubleValue();
+
+    BigDecimal salarioLiquido = new BigDecimal(this.salarioLiquido).setScale(2, RoundingMode.HALF_UP);
+
     return salarioLiquido.setScale(2, RoundingMode.HALF_UP);
   }
 
   public void setSalarioLiquido(Double salarioBruto) {
-    this.salarioLiquido = BigDecimal.valueOf(salarioBruto - (salarioBruto * 0.08));
+    // calculo INSS
+    if (salarioBruto <= 1751.81) {
+      this.salarioLiquido = salarioBruto - (salarioBruto * 0.08);
+    } else if (salarioBruto >= 1751.81 && salarioBruto <= 2919.72) {
+      this.salarioLiquido = salarioBruto - (salarioBruto * 0.09);
+    } else {
+      this.salarioLiquido = salarioBruto - (salarioBruto * 0.11);
+    }
+
+    // calcular IRRF
+    if (salarioLiquido >= 1903.99 && salarioLiquido <= 2826.65) {
+      this.salarioLiquido -= ((salarioLiquido * 0.075) - 142.8);
+    } else if (salarioLiquido >= 2826.66 && salarioLiquido <= 3751.05) {
+      this.salarioLiquido -= ((salarioLiquido * 0.15) - 354.8);
+    } else if (salarioLiquido >= 3751.06 && salarioLiquido <= 4664.68) {
+      this.salarioLiquido -= ((salarioLiquido * 0.225) - 636.13);
+    } else if (salarioLiquido > 4664.68) {
+      this.salarioLiquido -= ((salarioLiquido * 0.275) - 869.36);
+    }
+
   }
 
   public boolean verificaValor(Double _salarioBruto) {
@@ -62,4 +85,5 @@ public class Salario {
     }
     return true;
   }
+
 }
